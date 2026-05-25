@@ -1,5 +1,1 @@
-# INKLAB Agenda Premium
-
-App estática HTML/CSS/JS desplegada en GitHub Pages.
-
-URL pública: https://uptobe8.github.io/agenda_ink/
+INKLAB Agenda. Base restaurada desde la versión funcional; cambios aplicados solo en CSS, textos de app, color dorado global y ajuste visual. Abrir index.html.
