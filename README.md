@@ -1,1 +1,1 @@
-INKLAB Agenda. Base restaurada desde la versión funcional; cambios aplicados solo en CSS, textos de app, color dorado global y ajuste visual. Abrir index.html.
+App actualizada sobre la base restaurada: menú reordenado, navegación móvil sin scroll horizontal y página Control con semáforos y mapas modernos.
