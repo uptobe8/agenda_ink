@@ -284,6 +284,19 @@ body.menu-open{overflow:hidden}
   font-size:12px;
 }
 
+
+/* FIX Home interactiva */
+.home-actions{margin-top:12px}
+.date-card{cursor:pointer}
+.date-card:active{transform:scale(.98)}
+.date-card.active{box-shadow:0 8px 20px rgba(140,113,64,.22)}
+.slot{overflow:hidden}
+.slot .event{min-width:0}
+.home-empty{color:var(--muted);font-size:13px}
+@media(max-width:720px){
+  .home-actions .btn{flex:1}
+}
+
 </style></head><body><div class="app"><header class="topbar"><a class="brand" href="index.html"><span><strong>INKLAB Madrid</strong><span>Agenda Studio</span></span></a><div class="actions"><button class="menu-toggle" id="menuToggle" type="button" aria-label="Abrir menú" aria-expanded="false"><span></span><span></span><span></span></button><button class="btn" id="themeToggle" type="button">Día</button><button class="btn primary" type="button" data-new>Nueva cita</button></div></header>
 <nav class="nav" id="mainNav" aria-label="Menú principal">
  <a href="index.html" data-nav="inicio">Hoy</a>
@@ -299,7 +312,7 @@ body.menu-open{overflow:hidden}
 <main>
  <section class="hero">
   <p class="eyebrow">Agenda operativa</p><h1>Agenda</h1>
-  <p>Inicio centrado en agenda real del estudio, no en gráficas. Las palancas quedan en su página específica.</p>
+  <p>Inicio centrado en agenda real del estudio, no en gráficas. Las palancas quedan en su página específica.</p><div class="ctarow home-actions"><button class="btn primary" type="button" data-new>Nueva cita</button><a class="btn" href="agenda.html">Abrir agenda</a></div>
  </section>
  <section class="grid">
   <article class="panel span12"><div class="kpis" id="homeKpis"></div></article>

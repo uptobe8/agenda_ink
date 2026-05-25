@@ -40,6 +40,7 @@
 
   let state = loadState();
   let currentDate = new Date(BASE_DATE);
+  let homeDate = new Date(BASE_DATE);
   let currentView = "day";
   let selectedTemplate = null;
   let selectedClient = null;
@@ -185,45 +186,72 @@
   function renderIndex(){
     if(!$("#homeKpis")) return;
 
-    const today = iso(BASE_DATE);
-    const todayApps = state.appointments.filter(a => a.date === today).sort((a,b)=>(a.time||"").localeCompare(b.time||""));
-    const pending = state.payments.filter(p => ["Pendiente","Vencido"].includes(p.status)).reduce((s,p)=>s+Number(p.amount||0),0);
+    const selected = iso(homeDate);
+    const weekStartDate = startWeek(homeDate);
+    const dayApps = state.appointments
+      .filter(a => a.date === selected)
+      .sort((a,b)=>(a.time||"").localeCompare(b.time||""));
+
+    const pending = state.payments
+      .filter(p => ["Pendiente","Vencido"].includes(p.status))
+      .reduce((s,p)=>s+Number(p.amount||0),0);
+
     const revenue = state.appointments.reduce((s,a)=>s+Number(a.price||0),0);
-    const hours = Math.round(state.appointments.reduce((s,a)=>s+Number(a.duration||0),0)/60);
+    const dayHours = Math.round(dayApps.reduce((s,a)=>s+Number(a.duration||0),0)/60*10)/10;
 
     $("#homeKpis").innerHTML =
-      kpi("Citas hoy", todayApps.length, "agenda") +
+      kpi("Citas", dayApps.length, "día seleccionado") +
+      kpi("Horas", dayHours+" h", "carga del día") +
       kpi("Reservado", euro(revenue), "trabajo previsto") +
-      kpi("Pendiente", euro(pending), "cobros") +
-      kpi("Horas", hours+" h", "ocupación");
+      kpi("Pendiente", euro(pending), "cobros");
 
     const dateStrip = $("#dateStrip");
     if(dateStrip){
-      const start = startWeek(BASE_DATE);
       dateStrip.innerHTML = Array.from({length:7},(_,i)=>{
-        const d = addDays(start,i);
+        const d = addDays(weekStartDate,i);
         const key = iso(d);
         const count = state.appointments.filter(a=>a.date===key).length;
-        return `<button type="button" class="date-card ${key===today?"active":""}" data-jump="${key}"><span>${d.toLocaleDateString("es-ES",{weekday:"short"})}</span><b>${d.getDate()}</b><small>${count} citas</small></button>`;
+        return `<button type="button" class="date-card ${key===selected?"active":""}" data-home-day="${key}">
+          <span>${d.toLocaleDateString("es-ES",{weekday:"short"})}</span>
+          <b>${d.getDate()}</b>
+          <small>${count} citas</small>
+        </button>`;
       }).join("");
     }
 
     const todaySchedule = $("#todaySchedule");
     if(todaySchedule){
-      todaySchedule.innerHTML = `<div class="day-layout"><div class="hours">${[9,11,13,15,17,19].map(h=>`<div class="hour-label">${h}:00</div>`).join("")}</div><div class="timeline">${
-        [9,11,13,15,17,19].map(h=>{
-          const arr = todayApps.filter(a => Number((a.time||"0").split(":")[0]) === h);
-          return `<div class="slot">${arr.length?arr.map(a=>`<div class="event"><div class="event-title">${a.time} · ${a.client}</div><div class="event-meta">${a.service} · ${a.artist}</div><div class="ctarow"><button type="button" data-edit="${a.id}">Editar</button></div></div>`).join(""):`<span class="muted">Hueco libre</span>`}</div>`;
-        }).join("")
-      }</div></div>`;
+      const hours = [9,10,11,12,13,14,15,16,17,18,19];
+      todaySchedule.innerHTML = `<div class="day-layout">
+        <div class="hours">${hours.map(h=>`<div class="hour-label">${String(h).padStart(2,"0")}:00</div>`).join("")}</div>
+        <div class="timeline">${
+          hours.map(h=>{
+            const arr = dayApps.filter(a => Number((a.time||"0").split(":")[0]) === h);
+            return `<div class="slot">${arr.length ? arr.map(a=>`
+              <div class="event">
+                <div class="event-title">${a.time} · ${a.client}</div>
+                <div class="event-meta">${a.service} · ${a.artist} · ${a.detail || ""}</div>
+                <div class="ctarow">
+                  <a class="cta call" href="tel:${cleanPhone(a.phone)}">Llamar</a>
+                  <a class="cta mail" href="mailto:${a.email || ""}?subject=Cita%20INKLAB">Mail</a>
+                  <a class="cta wa" href="https://wa.me/${cleanPhone(a.whatsapp || a.phone).replace("+","")}">WhatsApp</a>
+                  <button type="button" data-edit="${a.id}">Editar</button>
+                </div>
+              </div>`).join("") : `<span class="home-empty">Hueco libre</span>`}</div>`;
+          }).join("")
+        }</div>
+      </div>`;
     }
+
+    const headTitle = document.querySelector(".panel.span8 h2");
+    if(headTitle) headTitle.textContent = new Date(selected+"T12:00:00").toLocaleDateString("es-ES",{weekday:"long",day:"2-digit",month:"short"});
 
     const homeNext = $("#homeNext");
     if(homeNext){
       homeNext.innerHTML = state.appointments
         .slice()
         .sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))
-        .slice(0,4)
+        .slice(0,5)
         .map(appointmentCard)
         .join("");
     }
@@ -691,6 +719,9 @@
 
       const clientBtn = e.target.closest("[data-client]");
       if(clientBtn){ e.preventDefault(); selectedClient = clientBtn.dataset.client; renderClients(); return; }
+
+      const homeDay = e.target.closest("[data-home-day]");
+      if(homeDay){ e.preventDefault(); homeDate = new Date(homeDay.dataset.homeDay+"T12:00:00"); renderIndex(); return; }
 
       const jump = e.target.closest("[data-jump]");
       if(jump){ e.preventDefault(); currentDate = new Date(jump.dataset.jump+"T12:00:00"); currentView = "day"; renderAgenda(); return; }

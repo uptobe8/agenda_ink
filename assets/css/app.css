@@ -283,3 +283,16 @@ body.menu-open{overflow:hidden}
   color:var(--muted);
   font-size:12px;
 }
+
+
+/* FIX Home interactiva */
+.home-actions{margin-top:12px}
+.date-card{cursor:pointer}
+.date-card:active{transform:scale(.98)}
+.date-card.active{box-shadow:0 8px 20px rgba(140,113,64,.22)}
+.slot{overflow:hidden}
+.slot .event{min-width:0}
+.home-empty{color:var(--muted);font-size:13px}
+@media(max-width:720px){
+  .home-actions .btn{flex:1}
+}
