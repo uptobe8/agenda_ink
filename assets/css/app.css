@@ -269,3 +269,17 @@ body.menu-open{overflow:hidden}
 }
 .camera-video[hidden],.preview[hidden],.hidden{display:none!important}
 .camera-actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}
+
+
+/* FIX Scanner: cámara o subir foto */
+.upload-input{display:none!important}
+.camera-actions .btn.upload-btn{
+  background:var(--surface)!important;
+  border-color:var(--line)!important;
+  color:var(--ink)!important;
+}
+.camera-source-note{
+  margin-top:8px;
+  color:var(--muted);
+  font-size:12px;
+}
