@@ -1,1 +1,0 @@
-Datos demo integrados en JS para máxima compatibilidad local.
